@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="left">
+      <div class="image-card">
+        <img src="https://clanlabs.in/wp-content/uploads/2021/09/Whatsapp-Marketing.png" alt="Model in phone" />
+      </div>
+    </div>
+    <div class="right glass">
+      <div class="whatsapp-icon" onclick="window.open('https://wa.me/1234567890', '_blank')">
+      <img src="2.svg" alt="Chatrix Logo" class="id" />
+
+    </div>
+
+      <h1 class="logo">Chatrix</h1>
+      <p class="tagline"><span class="typing-text"></span></p>
+      <div class="actions">
+        <button class="btn signin" onclick="window.location.href='otp.html'">Sign In</button>
+        <button class="btn signup" onclick="window.location.href='otp.html'">Sign Up</button>
+      </div>
+      
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

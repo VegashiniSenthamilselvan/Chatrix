@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Call Simulation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, rgba(132, 248, 140, 0.9), rgba(82, 134, 95, 0.9));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #callScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(132, 248, 140, 0.9), rgba(82, 134, 95, 0.9));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .call-box {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .call-box h2 {
+      margin-bottom: 10px;
+    }
+
+    .call-box p {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    #callTimer {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    #endCallBtn {
+      padding: 10px 20px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #endCallBtn:hover {
+      background-color: #cc0000;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="callScreen">
+    <div class="call-box">
+      <h2 id="callerName">Audio Up...</h2>
+      <p id="callStatus">Ringing...</p>
+      <div id="callTimer"><span id="minutes">00</span>:<span id="seconds">00</span></div>
+      <button id="endCallBtn">End Call</button>
+    </div>
+  </div>
+
+<script>
+ // --------------------- VOICE CALL LOGIC (wcall.js) -------------------------
+
+function getChatId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('chat') || 'default';
+}
+const chatId = getChatId();
+
+const callScreen = document.getElementById("callScreen");
+const callerName = document.getElementById("callerName");
+const callStatus = document.getElementById("callStatus");
+const callTimer = document.getElementById("callTimer");
+const minutes = document.getElementById("minutes");
+const seconds = document.getElementById("seconds");
+const endCallBtn = document.getElementById("endCallBtn");
+
+let callTimerInterval = null;
+let callTimeout = null;
+let elapsedSeconds = 0;
+
+function startTimer() {
+  elapsedSeconds = 0;
+  callTimer.style.display = "block";
+  callTimerInterval = setInterval(() => {
+    elapsedSeconds++;
+    const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+    const secs = String(elapsedSeconds % 60).padStart(2, '0');
+    minutes.textContent = mins;
+    seconds.textContent = secs;
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(callTimerInterval);
+  callTimer.style.display = "none";
+  minutes.textContent = "00";
+  seconds.textContent = "00";
+}
+
+function formatCallDuration(seconds) {
+  if (seconds >= 60) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return secs === 0
+      ? `${mins} min${mins > 1 ? "s" : ""}`
+      : `${mins} min${mins > 1 ? "s" : ""} ${secs} sec${secs > 1 ? "s" : ""}`;
+  } else if (seconds > 0) {
+    return `${seconds} sec${seconds > 1 ? "s" : ""}`;
+  } else {
+    return "No answer";
+  }
+}
+
+function endCall() {
+  clearTimeout(callTimeout);
+  stopTimer();
+  callScreen.style.display = "none";
+
+  const durationText = formatCallDuration(elapsedSeconds);
+  const endedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+  // Store call summary in localStorage for the chat
+  const callMessage = {
+    id: Date.now(),
+    type: "call",
+    status: durationText,
+    endedAt: endedTime,
+    icon: "📞", // You can use a URL or emoji
+    sender: "You"
+  };
+
+  const chatKey = "chat_messages_" + chatId;
+  let chatMessages = JSON.parse(localStorage.getItem(chatKey) || "[]");
+  chatMessages.push(callMessage);
+  localStorage.setItem(chatKey, JSON.stringify(chatMessages));
+
+  // Return to chat page
+  window.location.href = "windex.html?chat=" + encodeURIComponent(chatId);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  if (!callScreen) return;
+
+  // Set caller name by chat
+  const nameMap = {
+    amor: "Calling Amor...",
+    friends: "Calling Friends Group...",
+    family: "Calling Family Group..."
+  };
+  callerName.textContent = nameMap[chatId] || "Audio Up...";
+
+  callStatus.textContent = "Ringing...";
+  callTimer.style.display = "none";
+  callScreen.style.display = "flex";
+
+  // Simulate connection
+  callTimeout = setTimeout(() => {
+    callStatus.textContent = "Connected";
+    startTimer();
+  }, 3000);
+});
+
+if (endCallBtn) {
+  endCallBtn.addEventListener("click", endCall);
+}
+
+</script>
+</html>

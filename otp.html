@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chatrix Login with OTP Popup</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #128C7E;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #fff;
+      width: 360px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .header {
+      background-color: #075E54;
+      color: white;
+      padding: 20px 25px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 1.3rem;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      background: #ece5dd;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px 0;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 500;
+      color: #075E54;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab.active {
+      border-bottom: 3px solid #25D366;
+      background-color: #fff;
+      color: #25D366;
+    }
+
+    form {
+      padding: 25px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #128C7E;
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    input, select {
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 18px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #25D366;
+    }
+
+    .phone-input {
+      display: flex;
+      margin-bottom: 18px;
+    }
+
+    .phone-input select {
+      width: 30%;
+      border-radius: 4px 0 0 4px;
+      border-right: none;
+    }
+
+    .phone-input input {
+      width: 70%;
+      border-radius: 0 4px 4px 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #25D366;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #128C7E;
+    }
+
+    .footer-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 20px;
+    }
+
+    .footer-text a {
+      color: #25D366;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 520px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      text-align: center;
+      position: relative;
+    }
+
+    .modal h2 {
+      color: #128C7E;
+      margin-bottom: 10px;
+    }
+
+    .otp-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    .otp-inputs input {
+      width: 45px;
+      height: 55px;
+      font-size: 2rem;
+      text-align: center;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      
+    }
+
+    .otp-inputs input:focus {
+      border-color: #25D366;
+    }
+
+    #resend {
+      color: #128C7E;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #resend.disabled {
+      color: #aaa;
+      pointer-events: none;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: #128C7E;
+      font-weight: bold;
+    }
+    .btn {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  background-color: #25D366;
+  color: white;
+  font-weight: 600;
+  border-radius: 25px;
+  text-decoration: none;
+}
+.btn:hover {
+  background-color: #128C7E;
+}
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">Chatrix</div>
+  <div class="tabs">
+    <div class="tab active" id="signin-tab">Sign In</div>
+    <div class="tab" id="signup-tab">Sign Up</div>
+  </div>
+
+  <form id="signin-form">
+    <div class="phone-input">
+      <select id="signin-country-code">
+        <option value="+1">+1</option>
+        <option value="+44">+44</option>
+        <option value="+91" selected>+91</option>
+      </select>
+      <input type="tel" id="signin-phone" placeholder="Phone number" required />
+    </div>
+    <button type="submit">Next</button>
+    <p class="footer-text">By continuing, you agree to WhatsApp's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+  </form>
+
+  <form id="signup-form" style="display: none;">
+    <label for="signup-name">Full Name</label>
+    <input type="text" id="signup-name" required />
+
+    <label for="signup-country-code">Country Code</label>
+    <select id="signup-country-code">
+      <option value="+1">+1</option>
+      <option value="+44">+44</option>
+      <option value="+91" selected>+91</option>
+    </select>
+
+    <label for="signup-phone">Phone Number</label>
+    <input type="tel" id="signup-phone" required />
+
+    <label for="signup-password">Password</label>
+    <input type="password" id="signup-password" required minlength="6" />
+
+    <button type="submit">Register</button>
+    <p class="footer-text">By registering, you agree to WhatsApp's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+  </form>
+</div>
+
+<!-- OTP Modal -->
+<div class="modal-overlay" id="otp-modal">
+  <div class="modal">
+    <div class="close-btn" id="close-otp">&times;</div>
+    <h2 id="otp-title">Verify OTP</h2>
+    <p id="otp-instruction">Enter the 6-digit code sent to your phone</p>
+    <form id="otp-form">
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+        <input type="text" maxlength="1" inputmode="numeric" />
+      </div>
+     <a href="windex.html" class="btn">Verify</a>
+
+    </form>
+    <div id="resend" class="disabled">Resend OTP (<span id="timer">30</span>s)</div>
+  </div>
+</div>
+
+<script>
+  const signinTab = document.getElementById('signin-tab');
+  const signupTab = document.getElementById('signup-tab');
+  const signinForm = document.getElementById('signin-form');
+  const signupForm = document.getElementById('signup-form');
+  const otpModal = document.getElementById('otp-modal');
+  const otpTitle = document.getElementById('otp-title');
+  const otpInstruction = document.getElementById('otp-instruction');
+  const otpInputs = otpModal.querySelectorAll('.otp-inputs input');
+  const resendBtn = document.getElementById('resend');
+  const timerSpan = document.getElementById('timer');
+  const closeOtp = document.getElementById('close-otp');
+
+  let generatedOtp = null;
+  let timerInterval;
+
+  function switchTab(tab) {
+    if (tab === 'signin') {
+      signinTab.classList.add('active');
+      signupTab.classList.remove('active');
+      signinForm.style.display = 'block';
+      signupForm.style.display = 'none';
+    } else {
+      signupTab.classList.add('active');
+      signinTab.classList.remove('active');
+      signupForm.style.display = 'block';
+      signinForm.style.display = 'none';
+    }
+  }
+
+  signinTab.onclick = () => switchTab('signin');
+  signupTab.onclick = () => switchTab('signup');
+
+  function showOtpModal(phone, isSignup = false) {
+    otpTitle.textContent = isSignup ? "Verify Your Number" : "Verify OTP";
+    otpInstruction.textContent = `Enter the code sent to ${phone}`;
+    otpModal.classList.add('active');
+    startTimer();
+    clearOtpInputs();
+  }
+
+  closeOtp.onclick = () => {
+    otpModal.classList.remove('active');
+    clearInterval(timerInterval);
+  };
+
+  function clearOtpInputs() {
+    otpInputs.forEach(input => input.value = '');
+    otpInputs[0].focus();
+  }
+
+  otpInputs.forEach((input, idx) => {
+    input.addEventListener('input', () => {
+      if (input.value && idx < otpInputs.length - 1) {
+        otpInputs[idx + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && idx > 0) {
+        otpInputs[idx - 1].focus();
+      }
+    });
+  });
+
+  function startTimer() {
+    let timeLeft = 30;
+    resendBtn.classList.add('disabled');
+    timerSpan.textContent = timeLeft;
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerSpan.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        resendBtn.classList.remove('disabled');
+        resendBtn.textContent = 'Resend OTP';
+      }
+    }, 1000);
+  }
+
+  resendBtn.onclick = () => {
+    if (!resendBtn.classList.contains('disabled')) {
+      generatedOtp = Math.floor(100000 + Math.random() * 900000);
+      alert('Resent OTP: ' + generatedOtp);
+      startTimer();
+    }
+  };
+
+  signinForm.onsubmit = (e) => {
+    e.preventDefault();
+    const code = document.getElementById('signin-country-code').value;
+    const phone = document.getElementById('signin-phone').value;
+    generatedOtp = Math.floor(100000 + Math.random() * 900000);
+    console.log('Sign-In OTP:', generatedOtp);
+    showOtpModal(code + ' ' + phone, false);
+  };
+
+  signupForm.onsubmit = (e) => {
+    e.preventDefault();
+    const code = document.getElementById('signup-country-code').value;
+    const phone = document.getElementById('signup-phone').value;
+    generatedOtp = Math.floor(100000 + Math.random() * 900000);
+    console.log('Sign-Up OTP:', generatedOtp);
+    showOtpModal(code + ' ' + phone, true);
+  };
+</script>
+</body>
+</html>
